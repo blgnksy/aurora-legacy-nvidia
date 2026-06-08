@@ -23,4 +23,15 @@ rpm -q akmod-nvidia-580xx xorg-x11-drv-nvidia-580xx xorg-x11-drv-nvidia-580xx-li
 
 dnf5 clean all
 
-echo "options nvidia-drm modeset=1 fbdev=1" > /usr/lib/modprobe.d/nvidia-modeset.conf
+# Blacklist nouveau and nova_core (Rust NVIDIA driver in Fedora 44 kernel) at both layers:
+# runtime (modprobe) and initramfs (dracut), equivalent of the kargs approach
+cat > /usr/lib/modprobe.d/nvidia-blacklist.conf << 'EOF'
+blacklist nouveau
+blacklist nova_core
+options nvidia-drm modeset=1 fbdev=1
+EOF
+
+mkdir -p /usr/lib/dracut/dracut.conf.d
+cat > /usr/lib/dracut/dracut.conf.d/nvidia-blacklist.conf << 'EOF'
+omit_drivers+=" nouveau nova_core "
+EOF
