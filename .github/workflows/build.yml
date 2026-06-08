@@ -1,0 +1,104 @@
+name: Build Aurora DX Legacy NVIDIA 
+
+on: 
+  workflow_dispatch: 
+  schedule: 
+    - cron: '0 */6 * * *' 
+    
+  push: 
+    branches: 
+      - master 
+
+permissions: 
+  contents: read 
+  packages: write
+  id-token: write
+
+jobs:
+  check-upstream:
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.compare.outputs.should_build }}
+      upstream_digest: ${{ steps.upstream.outputs.digest }}
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get upstream image digest
+        id: upstream
+        run: |
+          DIGEST=$(skopeo inspect docker://ghcr.io/ublue-os/aurora-dx:stable | jq -r '.Digest')
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
+      - name: Get our image's recorded base digest
+        id: ours
+        run: |
+          DIGEST=""
+          if skopeo inspect docker://ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest > /tmp/inspect.json 2>/dev/null; then
+            DIGEST=$(jq -r '.Labels["org.opencontainers.image.base.digest"] // ""' /tmp/inspect.json)
+          fi
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
+      - name: Compare digests
+        id: compare
+        run: |
+          UPSTREAM="${{ steps.upstream.outputs.digest }}"
+          OURS="${{ steps.ours.outputs.digest }}"
+          EVENT="${{ github.event_name }}"
+          if [ "$EVENT" != "schedule" ] || [ "$UPSTREAM" != "$OURS" ]; then
+            echo "should_build=true" >> $GITHUB_OUTPUT
+            echo "Building: event=$EVENT upstream=$UPSTREAM ours=$OURS"
+          else
+            echo "should_build=false" >> $GITHUB_OUTPUT
+            echo "Upstream digest unchanged, skipping build."
+          fi
+
+  build:
+    needs: check-upstream
+    if: needs.check-upstream.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Build and push image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=Aurora DX with legacy NVIDIA 580xx drivers
+            org.opencontainers.image.base.name=ghcr.io/ublue-os/aurora-dx:stable
+            org.opencontainers.image.base.digest=${{ needs.check-upstream.outputs.upstream_digest }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Sign image
+        run: |
+          cosign sign --yes \
+            --key env://COSIGN_PRIVATE_KEY \
+            ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia@${{ steps.build.outputs.digest }}
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ""

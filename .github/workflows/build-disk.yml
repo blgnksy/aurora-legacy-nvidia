@@ -1,0 +1,76 @@
+name: Build Disk Image
+
+on:
+  workflow_run:
+    workflows: ["Build Aurora DX Legacy NVIDIA"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  build-disk:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
+          df -h
+
+      - name: Login to GHCR
+        run: |
+          sudo podman login ghcr.io \
+            --username ${{ github.actor }} \
+            --password ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull container image
+        run: |
+          sudo podman pull ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
+
+      - name: Build installer ISO
+        run: |
+          mkdir -p output
+          sudo podman run \
+            --rm \
+            --privileged \
+            --pull=newer \
+            --security-opt label=type:unconfined_t \
+            -v $(pwd)/output:/output \
+            -v /var/lib/containers/storage:/var/lib/containers/storage \
+            quay.io/centos-bootc/bootc-image-builder:latest \
+            --type anaconda-iso \
+            --local \
+            ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
+
+      - name: Get short digest for release notes
+        id: digest
+        run: |
+          SHORT=$(sudo podman inspect ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest \
+            | jq -r '.[0].Digest' | cut -c8-15)
+          echo "short=$SHORT" >> $GITHUB_OUTPUT
+
+      - name: Publish as rolling GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: disk-latest
+          name: "Latest Installer (build ${{ github.run_number }})"
+          prerelease: true
+          body: |
+            Bootable Anaconda installer ISO for **aurora-dx-legacy-nvidia**.
+
+            Built from: `ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest` (`${{ steps.digest.outputs.short }}`)
+
+            ### Install from ISO
+            Boot the ISO and follow the Anaconda installer.
+
+            ### Rebase an existing Fedora Atomic system instead
+            ```
+            rpm-ostree rebase ostree-image-signed:docker://ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia:latest
+            ```
+          files: output/bootiso/install.iso
+          fail_on_unmatched_files: true
