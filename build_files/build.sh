@@ -10,6 +10,7 @@ dnf5 install -y \
     /tmp/akmods-rpms/nvidia/*.rpm \
     libva-nvidia-driver
 
+dnf5 config-manager setopt nvidia-container-toolkit.enabled=1
 dnf5 install -y nvidia-container-toolkit
 
 dnf5 clean all
