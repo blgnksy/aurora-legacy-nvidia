@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  packages: read
+  contents: read
+  packages: write
 
 jobs:
   build-disk:
@@ -47,30 +47,13 @@ jobs:
             --rootfs xfs \
             ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
 
-      - name: Get short digest for release notes
-        id: digest
+      - name: Install ORAS
+        uses: oras-project/setup-oras@v1
+
+      - name: Push ISO to GHCR
         run: |
-          SHORT=$(sudo podman inspect ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest \
-            | jq -r '.[0].Digest' | cut -c8-15)
-          echo "short=$SHORT" >> $GITHUB_OUTPUT
-
-      - name: Publish as rolling GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: disk-latest
-          name: "Latest Installer (build ${{ github.run_number }})"
-          prerelease: true
-          body: |
-            Bootable Anaconda installer ISO for **aurora-dx-legacy-nvidia**.
-
-            Built from: `ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest` (`${{ steps.digest.outputs.short }}`)
-
-            ### Install from ISO
-            Boot the ISO and follow the Anaconda installer.
-
-            ### Rebase an existing Fedora Atomic system instead
-            ```
-            rpm-ostree rebase ostree-image-signed:docker://ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
-            ```
-          files: output/bootiso/install.iso
-          fail_on_unmatched_files: true
+          oras push \
+            --username ${{ github.actor }} \
+            --password ${{ secrets.GITHUB_TOKEN }} \
+            ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia-iso:latest \
+            output/bootiso/install.iso:application/x-iso9660-image
