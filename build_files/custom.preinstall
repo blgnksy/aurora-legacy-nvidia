@@ -1,0 +1,88 @@
+# Custom Flatpak applications for aurora-dx-legacy-nvidia
+# Installed on first boot via finpilot
+
+# Office & Productivity
+[Flatpak Preinstall com.collaboraoffice.Office]
+Branch=stable
+
+[Flatpak Preinstall net.cozic.joplin_desktop]
+Branch=stable
+
+# Cloud & Sync
+[Flatpak Preinstall com.nextcloud.desktopclient.nextcloud]
+Branch=stable
+
+# Browsers
+[Flatpak Preinstall com.vivaldi.Vivaldi]
+Branch=stable
+
+# Privacy & Security
+[Flatpak Preinstall com.protonvpn.www]
+Branch=stable
+
+[Flatpak Preinstall me.proton.Mail]
+Branch=stable
+
+[Flatpak Preinstall me.proton.Pass]
+Branch=stable
+
+# Developer Tools
+[Flatpak Preinstall io.github.BuddySirJava.SSH-Studio]
+Branch=stable
+
+[Flatpak Preinstall io.github.DenysMb.Kontainer]
+Branch=stable
+
+[Flatpak Preinstall io.podman_desktop.PodmanDesktop]
+Branch=stable
+
+[Flatpak Preinstall me.iepure.devtoolbox]
+Branch=stable
+
+# System Utilities
+[Flatpak Preinstall io.github.getnf.embellish]
+Branch=stable
+
+[Flatpak Preinstall io.github.maniacx.BudsLink]
+Branch=stable
+
+[Flatpak Preinstall org.deskflow.deskflow]
+Branch=stable
+
+[Flatpak Preinstall org.fedoraproject.MediaWriter]
+Branch=stable
+
+[Flatpak Preinstall org.localsend.localsend_app]
+Branch=stable
+
+# Media
+[Flatpak Preinstall org.videolan.VLC]
+Branch=stable
+
+# KDE Apps
+[Flatpak Preinstall org.kde.drawy]
+Branch=stable
+
+[Flatpak Preinstall org.kde.gwenview]
+Branch=stable
+
+[Flatpak Preinstall org.kde.kasts]
+Branch=stable
+
+[Flatpak Preinstall org.kde.kcalc]
+Branch=stable
+
+[Flatpak Preinstall org.kde.kclock]
+Branch=stable
+
+[Flatpak Preinstall org.kde.kontact]
+Branch=stable
+
+[Flatpak Preinstall org.kde.kweather]
+Branch=stable
+
+[Flatpak Preinstall org.kde.okular]
+Branch=stable
+
+[Flatpak Preinstall org.kde.skanpage]
+Branch=stable
