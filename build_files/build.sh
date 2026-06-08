@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-dnf5 install -y \
-    rpmfusion-free-release \
-    rpmfusion-nonfree-release
+# aurora-dx ships RPM Fusion repo files but disables them — enable nonfree for akmod-nvidia-580xx
+sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/rpmfusion-nonfree*.repo
 
 dnf5 makecache
 
