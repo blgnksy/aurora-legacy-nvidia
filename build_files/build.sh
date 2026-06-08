@@ -22,3 +22,5 @@ set -e
 rpm -q akmod-nvidia-580xx xorg-x11-drv-nvidia-580xx xorg-x11-drv-nvidia-580xx-libs
 
 dnf5 clean all
+
+echo "options nvidia-drm modeset=1 fbdev=1" > /usr/lib/modprobe.d/nvidia-modeset.conf
