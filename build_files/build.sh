@@ -35,3 +35,23 @@ mkdir -p /usr/lib/dracut/dracut.conf.d
 cat > /usr/lib/dracut/dracut.conf.d/nvidia-blacklist.conf << 'EOF'
 omit_drivers+=" nouveau nova_core "
 EOF
+
+# Bake kernel args into the bootc image so they are applied on fresh installs
+# without requiring manual rpm-ostree kargs after rebasing/switching
+mkdir -p /usr/lib/bootc/kargs.d
+cat > /usr/lib/bootc/kargs.d/nvidia.toml << 'EOF'
+kargs = [
+    "modprobe.blacklist=nouveau",
+    "modprobe.blacklist=nova_core",
+    "rd.driver.blacklist=nouveau",
+    "rd.driver.blacklist=nova_core",
+]
+EOF
+
+# akmods.service refuses to run on OStree by default (ConditionPathExists=!/run/ostree-booted).
+# Clear that condition so the module builds on first boot after a fresh ISO install.
+mkdir -p /usr/lib/systemd/system/akmods.service.d
+cat > /usr/lib/systemd/system/akmods.service.d/ostree.conf << 'EOF'
+[Unit]
+ConditionPathExists=
+EOF
