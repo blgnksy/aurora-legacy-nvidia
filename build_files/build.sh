@@ -13,10 +13,6 @@ dnf5 install -y \
     xorg-x11-drv-nvidia-580xx-libs \
     xorg-x11-drv-nvidia-580xx-cuda \
     xorg-x11-drv-nvidia-580xx-cuda-libs \
-    libva-nvidia-driver \
-    nvidia-container-toolkit \
-    nvidia-container-toolkit-base \
-    libnvidia-container1 \
-    libnvidia-container-tools
+    libva-nvidia-driver
 
 dnf5 clean all
