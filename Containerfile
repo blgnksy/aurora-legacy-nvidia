@@ -1,6 +1,6 @@
 FROM ghcr.io/ublue-os/akmods-nvidia-lts:main-44 AS akmods-nvidia
 
-FROM ghcr.io/ublue-os/aurora-dx:stable
+FROM ghcr.io/ublue-os/aurora-dx:latest
 
 COPY system_files/shared/ /
 COPY build_files/ /tmp/build_files/

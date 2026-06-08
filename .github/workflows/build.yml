@@ -31,7 +31,7 @@ jobs:
       - name: Get upstream image digest
         id: upstream
         run: |
-          DIGEST=$(skopeo inspect docker://ghcr.io/ublue-os/aurora-dx:stable | jq -r '.Digest')
+          DIGEST=$(skopeo inspect docker://ghcr.io/ublue-os/aurora-dx:latest | jq -r '.Digest')
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
       - name: Get our image's recorded base digest
@@ -90,7 +90,7 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=Aurora DX with legacy NVIDIA 580xx drivers
-            org.opencontainers.image.base.name=ghcr.io/ublue-os/aurora-dx:stable
+            org.opencontainers.image.base.name=ghcr.io/ublue-os/aurora-dx:latest
             org.opencontainers.image.base.digest=${{ needs.check-upstream.outputs.upstream_digest }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
