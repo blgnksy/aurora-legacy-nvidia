@@ -70,7 +70,7 @@ jobs:
 
             ### Rebase an existing Fedora Atomic system instead
             ```
-            rpm-ostree rebase ostree-image-signed:docker://ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia:latest
+            rpm-ostree rebase ostree-image-signed:docker://ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
             ```
           files: output/bootiso/install.iso
           fail_on_unmatched_files: true
