@@ -2,7 +2,7 @@ name: Build Disk Image
 
 on:
   workflow_run:
-    workflows: ["Build Aurora Legacy NVIDIA"]
+    workflows: ["Build Aurora DX Legacy NVIDIA"]
     types:
       - completed
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
 
       - name: Pull container image
         run: |
-          sudo podman pull ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia:latest
+          sudo podman pull ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
 
       - name: Build installer ISO
         run: |
@@ -45,12 +45,12 @@ jobs:
             quay.io/centos-bootc/bootc-image-builder:latest \
             --type anaconda-iso \
             --local \
-            ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia:latest
+            ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
 
       - name: Get short digest for release notes
         id: digest
         run: |
-          SHORT=$(sudo podman inspect ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia:latest \
+          SHORT=$(sudo podman inspect ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest \
             | jq -r '.[0].Digest' | cut -c8-15)
           echo "short=$SHORT" >> $GITHUB_OUTPUT
 
@@ -61,9 +61,9 @@ jobs:
           name: "Latest Installer (build ${{ github.run_number }})"
           prerelease: true
           body: |
-            Bootable Anaconda installer ISO for **aurora-legacy-nvidia**.
+            Bootable Anaconda installer ISO for **aurora-dx-legacy-nvidia**.
 
-            Built from: `ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia:latest` (`${{ steps.digest.outputs.short }}`)
+            Built from: `ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest` (`${{ steps.digest.outputs.short }}`)
 
             ### Install from ISO
             Boot the ISO and follow the Anaconda installer.

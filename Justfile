@@ -1,4 +1,4 @@
-image_name := "aurora-legacy-nvidia"
+image_name := "aurora-dx-legacy-nvidia"
 
 # Build the image locally
 build:

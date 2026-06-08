@@ -1,4 +1,4 @@
-name: Build Aurora Legacy NVIDIA 
+name: Build Aurora DX Legacy NVIDIA 
 
 on: 
   workflow_dispatch: 
@@ -38,7 +38,7 @@ jobs:
         id: ours
         run: |
           DIGEST=""
-          if skopeo inspect docker://ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia:latest > /tmp/inspect.json 2>/dev/null; then
+          if skopeo inspect docker://ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest > /tmp/inspect.json 2>/dev/null; then
             DIGEST=$(jq -r '.Labels["org.opencontainers.image.base.digest"] // ""' /tmp/inspect.json)
           fi
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
@@ -85,7 +85,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/aurora-legacy-nvidia:latest
+            ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=Aurora DX with legacy NVIDIA 580xx drivers
