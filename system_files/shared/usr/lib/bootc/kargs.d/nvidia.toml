@@ -1,0 +1,8 @@
+kargs = [
+    "rd.driver.blacklist=nouveau",
+    "rd.driver.blacklist=nova_core",
+    "modprobe.blacklist=nouveau",
+    "modprobe.blacklist=nova_core",
+    "nvidia-drm.modeset=1",
+    "initcall_blacklist=simpledrm_platform_driver_init",
+]
