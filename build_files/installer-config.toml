@@ -1,0 +1,4 @@
+[customizations.installer.kickstart]
+contents = """
+# No storage directives — Anaconda will present the interactive storage screen
+"""

@@ -32,6 +32,9 @@ jobs:
         run: |
           sudo podman pull ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Build installer ISO
         run: |
           mkdir -p output
@@ -42,9 +45,11 @@ jobs:
             --security-opt label=type:unconfined_t \
             -v $(pwd)/output:/output \
             -v /var/lib/containers/storage:/var/lib/containers/storage \
+            -v $(pwd)/build_files/installer-config.toml:/config.toml:ro \
             quay.io/centos-bootc/bootc-image-builder:latest \
             --type anaconda-iso \
             --rootfs xfs \
+            --config /config.toml \
             ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia:latest
 
       - name: Install ORAS
