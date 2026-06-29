@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-# Sync the base image to the current kernel/package set before installing the
-# pre-built NVIDIA modules. The akmod packages are built against a specific
-# kernel ABI and fail if the image still carries an older kernel stack.
-dnf5 upgrade -y --refresh
-
 # Install pre-built kmod and driver packages from akmods-nvidia-lts.
 # ublue-os-nvidia-addons drops nvidia-container-toolkit.repo but it's not
 # visible until the next dnf invocation, so the toolkit is installed separately.
