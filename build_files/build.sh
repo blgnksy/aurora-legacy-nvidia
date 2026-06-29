@@ -19,9 +19,7 @@ dnf5 clean all
 mkdir -p /etc/docker
 nvidia-ctk runtime configure --runtime=docker
 
-# Configure POdman to use the NVIDIA container runtime
-if command -v nvidia-ctk >/dev/null 2>&1; then
-    mkdir -p /etc/containers/cdi.d /etc/cdi
-    nvidia-ctk cdi generate --output=/etc/containers/cdi.d/nvidia.json || true
-    nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml || true
-fi
+# Ensure CDI generation service runs on first boot.
+# RPM %post scriptlets can't call systemctl in a container build, so the
+# preset file from ublue-os-nvidia-addons may not have created the symlink.
+systemctl enable --root=/ ublue-nvctk-cdi.service
