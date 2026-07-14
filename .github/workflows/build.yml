@@ -75,7 +75,7 @@ jobs:
       - name: Install cosign
         uses: sigstore/cosign-installer@v3
 
-      - name: Build and push image
+      - name: Build image
         id: build
         uses: redhat-actions/buildah-build@v2
         with:
@@ -89,14 +89,20 @@ jobs:
             org.opencontainers.image.description=Aurora DX with legacy NVIDIA 580xx drivers
             org.opencontainers.image.base.name=ghcr.io/ublue-os/aurora-dx:latest
             org.opencontainers.image.base.digest=${{ needs.check-upstream.outputs.upstream_digest }}
-          push: true
+
+      - name: Push image
+        id: push
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build.outputs.image }}
+          tags: ${{ steps.build.outputs.tags }}
           registry: ghcr.io/${{ github.repository_owner }}
 
       - name: Sign image
         run: |
           cosign sign --yes \
             --key env://COSIGN_PRIVATE_KEY \
-            ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia@${{ steps.build.outputs.digest }}
+            ghcr.io/${{ github.repository_owner }}/aurora-dx-legacy-nvidia@${{ steps.push.outputs.digest }}
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ""
