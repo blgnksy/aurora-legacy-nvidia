@@ -84,6 +84,7 @@ jobs:
             Containerfile
           image: aurora-dx-legacy-nvidia
           tags: latest
+          oci: false
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=Aurora DX with legacy NVIDIA 580xx drivers
