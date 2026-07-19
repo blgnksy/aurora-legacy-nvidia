@@ -20,4 +20,3 @@ mkdir -p /etc/docker
 nvidia-ctk runtime configure --runtime=docker
 
 systemctl enable --root=/ ublue-nvctk-cdi.service
-systemctl enable --root=/ nvidia-suspend.service nvidia-resume.service nvidia-hibernate.service
