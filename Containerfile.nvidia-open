@@ -1,0 +1,8 @@
+FROM ghcr.io/ublue-os/aurora-dx-nvidia-open:stable
+
+COPY build_files/ /tmp/build_files/
+
+RUN chmod +x /tmp/build_files/build-nvidia-open.sh && \
+    /tmp/build_files/build-nvidia-open.sh
+
+COPY build_files/custom-nvidia-open.preinstall /etc/flatpak/preinstall.d/custom.preinstall
