@@ -11,7 +11,6 @@ rpm --import "https://rpm.tuxedocomputers.com/fedora/${FEDORA_VER}/0x54840598.pu
 dnf5 config-manager addrepo --from-repofile="https://rpm.tuxedocomputers.com/fedora/tuxedo.repo"
 dnf5 install -y \
     tuxedo-control-center \
-    tuxedo-fix-nvidia-preserve-vram-suspend \
     tuxedo-tomte \
     tuxedo-firmware-collection
 
@@ -21,3 +20,4 @@ mkdir -p /etc/docker
 nvidia-ctk runtime configure --runtime=docker
 
 systemctl enable --root=/ ublue-nvctk-cdi.service
+systemctl enable --root=/ nvidia-suspend.service nvidia-resume.service nvidia-hibernate.service
