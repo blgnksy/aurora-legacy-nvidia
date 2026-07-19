@@ -9,7 +9,7 @@ dnf5 install -y nvidia-container-toolkit
 FEDORA_VER=$(rpm -E '%fedora')
 rpm --import "https://rpm.tuxedocomputers.com/fedora/${FEDORA_VER}/0x54840598.pub.asc"
 dnf5 config-manager addrepo --from-repofile="https://rpm.tuxedocomputers.com/fedora/tuxedo.repo"
-dnf5 install -y \
+dnf5 install -y --exclude=tuxedo-control-center \
     tuxedo-drivers \
     tuxedo-tomte \
     tuxedo-firmware-collection
