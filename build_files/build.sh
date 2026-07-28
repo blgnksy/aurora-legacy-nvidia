@@ -13,6 +13,17 @@ dnf5 install -y \
 dnf5 config-manager setopt nvidia-container-toolkit.enabled=1
 dnf5 install -y nvidia-container-toolkit
 
+# Debugging tools
+dnf5 install -y \
+    gdb \
+    gdb-gdbserver \
+    strace \
+    ltrace \
+    perf \
+    valgrind \
+    binutils \
+    elfutils
+
 dnf5 clean all
 
 # Configure Docker to use the NVIDIA container runtime

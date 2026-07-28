@@ -5,6 +5,17 @@ set -euxo pipefail
 dnf5 config-manager setopt nvidia-container-toolkit.enabled=1
 dnf5 install -y nvidia-container-toolkit
 
+# Debugging tools
+dnf5 install -y \
+    gdb \
+    gdb-gdbserver \
+    strace \
+    ltrace \
+    perf \
+    valgrind \
+    binutils \
+    elfutils
+
 # TUXEDO repo — fan control, performance profiles, hardware drivers
 FEDORA_VER=$(rpm -E '%fedora')
 rpm --import "https://rpm.tuxedocomputers.com/fedora/${FEDORA_VER}/0x54840598.pub.asc"
