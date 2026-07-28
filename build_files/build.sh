@@ -22,7 +22,11 @@ dnf5 install -y \
     perf \
     valgrind \
     binutils \
-    elfutils
+    elfutils \
+    bpftrace \
+    lsof \
+    sysstat \
+    tcpdump
 
 dnf5 clean all
 
