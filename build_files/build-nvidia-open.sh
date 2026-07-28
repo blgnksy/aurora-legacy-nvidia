@@ -14,7 +14,11 @@ dnf5 install -y \
     perf \
     valgrind \
     binutils \
-    elfutils
+    elfutils \
+    bpftrace \
+    lsof \
+    sysstat \
+    tcpdump
 
 # TUXEDO repo — fan control, performance profiles, hardware drivers
 FEDORA_VER=$(rpm -E '%fedora')
