@@ -77,24 +77,36 @@ cp -r node_modules/electron /tmp/tcc-electron-runtime
 npm prune --omit=dev
 popd
 
-# /opt is also a symlink to /var/opt (same ostree "stateless" convention as
-# /root -> /var/roothome above), and it doesn't exist yet during the build.
-mkdir -p /var/opt
-install -d /opt/tuxedo-control-center/resources/dist
-cp -r /tmp/tcc/dist/tuxedo-control-center /opt/tuxedo-control-center/resources/dist/
-cp -r /tmp/tcc/node_modules /opt/tuxedo-control-center/resources/dist/tuxedo-control-center/node_modules
-cp -r /tmp/tcc-electron-runtime /opt/tuxedo-control-center/electron
-chmod 4755 /opt/tuxedo-control-center/electron/dist/chrome-sandbox
+# /opt resolves to /var/opt, and /var is persistent state that ostree/bootc
+# does NOT re-sync from the image on an upgrade of an already-existing
+# deployment (only a fresh install would pick up new /var content) — so
+# anything installed directly under /opt would silently vanish after
+# `bootc upgrade` on a system that already has a prior deployment. Install
+# the real payload under /usr instead (properly versioned/replaced every
+# upgrade), and use a tmpfiles.d rule so /var/opt/tuxedo-control-center
+# becomes a symlink to it on every boot — TCC's own compiled code and its
+# systemd/desktop files hardcode /opt/tuxedo-control-center/... paths, so
+# that symlink has to keep resolving rather than relocating those paths.
+install -d /usr/lib/tuxedo-control-center/resources/dist
+cp -r /tmp/tcc/dist/tuxedo-control-center /usr/lib/tuxedo-control-center/resources/dist/
+cp -r /tmp/tcc/node_modules /usr/lib/tuxedo-control-center/resources/dist/tuxedo-control-center/node_modules
+cp -r /tmp/tcc-electron-runtime /usr/lib/tuxedo-control-center/electron
+chmod 4755 /usr/lib/tuxedo-control-center/electron/dist/chrome-sandbox
 
-cat > /opt/tuxedo-control-center/tuxedo-control-center <<'WRAPPER'
+cat > /usr/lib/tuxedo-control-center/tuxedo-control-center <<'WRAPPER'
 #!/bin/bash
-exec /opt/tuxedo-control-center/electron/dist/electron /opt/tuxedo-control-center/resources/dist/tuxedo-control-center "$@"
+exec /usr/lib/tuxedo-control-center/electron/dist/electron /usr/lib/tuxedo-control-center/resources/dist/tuxedo-control-center "$@"
 WRAPPER
-chmod +x /opt/tuxedo-control-center/tuxedo-control-center
-ln -sf /opt/tuxedo-control-center/tuxedo-control-center /usr/bin/tuxedo-control-center
+chmod +x /usr/lib/tuxedo-control-center/tuxedo-control-center
+ln -sf /usr/lib/tuxedo-control-center/tuxedo-control-center /usr/bin/tuxedo-control-center
 echo "${TCC_BUILD_TAG}" > /usr/lib/tuxedo-control-center-build-version
 
-DIST_DATA=/opt/tuxedo-control-center/resources/dist/tuxedo-control-center/data/dist-data
+install -d /usr/lib/tmpfiles.d
+cat > /usr/lib/tmpfiles.d/tuxedo-control-center.conf <<'TMPFILES'
+L+ /var/opt/tuxedo-control-center - - - - /usr/lib/tuxedo-control-center
+TMPFILES
+
+DIST_DATA=/usr/lib/tuxedo-control-center/resources/dist/tuxedo-control-center/data/dist-data
 install -Dm644 "${DIST_DATA}/tuxedo-control-center.desktop" /usr/share/applications/tuxedo-control-center.desktop
 install -Dm644 "${DIST_DATA}/tuxedo-control-center-tray.desktop" /etc/skel/.config/autostart/tuxedo-control-center-tray.desktop
 install -Dm644 "${DIST_DATA}/com.tuxedocomputers.tccd.policy" /usr/share/polkit-1/actions/com.tuxedocomputers.tccd.policy
