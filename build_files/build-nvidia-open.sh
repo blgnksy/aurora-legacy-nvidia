@@ -101,11 +101,6 @@ chmod +x /usr/lib/tuxedo-control-center/tuxedo-control-center
 ln -sf /usr/lib/tuxedo-control-center/tuxedo-control-center /usr/bin/tuxedo-control-center
 echo "${TCC_BUILD_TAG}" > /usr/lib/tuxedo-control-center-build-version
 
-install -d /usr/lib/tmpfiles.d
-cat > /usr/lib/tmpfiles.d/tuxedo-control-center.conf <<'TMPFILES'
-L+ /var/opt/tuxedo-control-center - - - - /usr/lib/tuxedo-control-center
-TMPFILES
-
 DIST_DATA=/usr/lib/tuxedo-control-center/resources/dist/tuxedo-control-center/data/dist-data
 install -Dm644 "${DIST_DATA}/tuxedo-control-center.desktop" /usr/share/applications/tuxedo-control-center.desktop
 install -Dm644 "${DIST_DATA}/tuxedo-control-center-tray.desktop" /etc/skel/.config/autostart/tuxedo-control-center-tray.desktop
@@ -117,6 +112,14 @@ install -Dm644 "${DIST_DATA}/tuxedo-control-center_256.svg" /usr/share/icons/hic
 install -Dm644 "${DIST_DATA}/99-webcam.rules" /etc/udev/rules.d/99-webcam.rules
 install -Dm644 "${DIST_DATA}/tccd.service" /etc/systemd/system/tccd.service
 install -Dm644 "${DIST_DATA}/tccd-sleep.service" /etc/systemd/system/tccd-sleep.service
+
+# tccd.service.d/10-restart.conf (system_files/nvidia-open) overrides
+# ExecStart/ExecStop to run through stock node instead of pkg's bundled
+# binary — pkg's patched Node bootstrap (embedded virtual filesystem
+# unpacking) races under a plain systemd launch and reliably crashes with a
+# V8 PageAllocator ENOMEM; confirmed it never happens run interactively, and
+# disappears under strace (classic race signature: ptrace serializes/slows
+# execution). It also adds Restart=, since the vendor unit has none.
 
 # tccd's own %post can't reliably enable services during a container build
 # (no running systemd), same issue worked around below for ublue-nvctk-cdi.
