@@ -34,7 +34,7 @@ dnf5 clean all
 mkdir -p /etc/docker
 nvidia-ctk runtime configure --runtime=docker
 
-# Ensure CDI generation service runs on first boot.
-# RPM %post scriptlets can't call systemctl in a container build, so the
-# preset file from ublue-os-nvidia-addons may not have created the symlink.
-systemctl enable --root=/ ublue-nvctk-cdi.service
+# ublue-os-nvidia-addons used to ship this disabled (needing a manual enable
+# here, since RPM %post can't call systemctl during a container build) but
+# now ships nvidia-cdi-refresh.service/.path instead, pre-enabled by the
+# package itself — nothing left for us to do here.

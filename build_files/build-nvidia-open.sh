@@ -122,7 +122,7 @@ install -Dm644 "${DIST_DATA}/tccd-sleep.service" /etc/systemd/system/tccd-sleep.
 # execution). It also adds Restart=, since the vendor unit has none.
 
 # tccd's own %post can't reliably enable services during a container build
-# (no running systemd), same issue worked around below for ublue-nvctk-cdi.
+# (no running systemd).
 systemctl enable --root=/ tccd.service tccd-sleep.service
 
 rm -rf /tmp/tcc
@@ -139,4 +139,7 @@ dnf5 clean all
 mkdir -p /etc/docker
 nvidia-ctk runtime configure --runtime=docker
 
-systemctl enable --root=/ ublue-nvctk-cdi.service
+# ublue-os-nvidia-addons used to ship this disabled (needing a manual enable
+# here, since RPM %post can't call systemctl during a container build) but
+# now ships nvidia-cdi-refresh.service/.path instead, pre-enabled by the
+# package itself — nothing left for us to do here.
