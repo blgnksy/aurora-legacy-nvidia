@@ -1,0 +1,12 @@
+[Unit]
+Description=Generate NVIDIA Container Toolkit CDI specifications
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/nvidia-ctk cdi generate
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
