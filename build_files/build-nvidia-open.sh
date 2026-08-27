@@ -63,7 +63,7 @@ echo "${TUXEDO_DRIVERS_BUILD_TAG}" > /usr/lib/tuxedo-drivers-build-version
 mkdir -p /var/roothome
 git config --global --add safe.directory '*'
 
-TCC_VERSION=3.0.8
+TCC_VERSION=3.0.9
 TCC_BUILD_TAG="${TCC_VERSION}-blgnksy"
 git clone --depth 1 --branch "v${TCC_VERSION}" \
     https://github.com/tuxedocomputers/tuxedo-control-center.git /tmp/tcc
