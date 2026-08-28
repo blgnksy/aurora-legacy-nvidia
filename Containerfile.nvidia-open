@@ -1,4 +1,4 @@
-FROM ghcr.io/ublue-os/aurora-dx-nvidia-open:latest
+FROM ghcr.io/ublue-os/aurora-dx-nvidia-open:stable
 
 COPY system_files/nvidia-open/ /
 COPY build_files/ /tmp/build_files/
